@@ -1,0 +1,12 @@
+table_set_default ipv4_lpm drop
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.1/32 => 00:00:0a:00:01:01 1
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.2/32 => 00:00:0a:00:01:02 2
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.5/32 => 00:00:0a:00:01:05 3
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.6/32 => 00:00:0a:00:01:06 4
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.7/32 => 00:00:0a:00:01:07 5
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.8/32 => 00:00:0a:00:01:08 6
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.1.9/32 => 00:00:0a:00:01:09 7
+
+
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.2.3/32 => 00:00:0a:00:02:00 8
+table_add MyIngress.ipv4_lpm ipv4_forward 10.0.2.4/32 => 00:00:0a:00:02:00 8
