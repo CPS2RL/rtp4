@@ -34,5 +34,4 @@ Each controller use a different scheduling algorithm. Our slack monotnoic algori
 Nowadays, controller more commonly use the Thrift API and P4Runtime API to communicate with switches.We used register,corresponding register helper functions, and flow tables provided by Thrift API to communicate with switch and transfer data. In addition to these two API's, the P4 community also provides some helper files to assist controller. These API and files are written in the `P4-utils` file.
 On the other hand, you can also compile and modify the Thrift API as needed. For example, we avoid table duplication by check whether the following variables are equal in this repo.
 ```
-sudo controller.py
 if(entry.mtach_key[0].exact.keys == match_key[0].exact.keys)
