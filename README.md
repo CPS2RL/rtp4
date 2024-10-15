@@ -31,7 +31,7 @@ sudo python3 controller1.py
 ```
 Each controller use a different scheduling algorithm. Our slack monotnoic algorithm is applied in `controller.py`, while the shortest finish time first algorithm is applied in `controller1.py`.
 ## Thrift API and Communication 
-Nowadays, controller more commonly use the Thrift API and P4Runtime API to communicate with switches.We used register,corresponding register helper functions, and flow tables provided by Thrift API to communicate with switch and transfer data. In addition to these two API's, the P4 community also provides some helper files to assist controller. These API and files are written in the `P4-utils` file.
+Nowadays, controller more commonly use the Thrift API and P4Runtime API to communicate with switches.We used register,corresponding register helper functions, and flow tables provided by `Thrift API` to communicate with switch and transfer data. In addition to these two API's, the P4 community also provides some helper files to assist controller. These API and files are written in the `P4-utils` file.
 On the other hand, you can also compile and modify the Thrift API as needed. For example, we avoid table duplication by check whether the following variables are equal in this repo.
 ```
 if(entry.mtach_key[0].exact.keys == match_key[0].exact.keys)
