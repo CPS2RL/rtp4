@@ -35,7 +35,7 @@ Nowadays, controller more commonly use the Thrift API and P4Runtime API to commu
 On the other hand, you can also compile and modify the Thrift API as needed. For example, we avoid table duplication by check whether the following variables are equal in this repo.
 ```
 if(entry.mtach_key[0].exact.keys == match_key[0].exact.keys)
-
+```
 ## Relevant Resources
 
 The P4 utils file is avaliable [here](https://github.com/nsg-ethz/p4-utils)
