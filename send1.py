@@ -19,7 +19,7 @@ target_bandwidth = 50*10**6
 packet_size = 1470
 packet_size_bits = packet_size * 8
 #packet_interval = packet_size_bits / target_bandwidth
-packet_interval  = 0.01
+packet_interval  = 0.1
 deadline_value= 5
 deadline_value2= 7
 deadline_value3= 9
@@ -36,10 +36,10 @@ weight5 = 5
 weight6 = 6
 weight7 = 7
 weight8 = 8
-flow_id = 0
-flow_id2 = 1
-flow_id3= 2
-flow_id4 = 3
+flow_id1 = 1
+flow_id2 = 2
+flow_id3= 3
+flow_id4 = 4
 flow_id5 = 5
 flow_id6 = 6
 flow_id7 = 7
@@ -73,10 +73,10 @@ def send_packets(src_host, dst_host, iface, duration, packet_interval, deadline_
         time.sleep(packet_interval)
 
 
-thread1 = threading.Thread(target=send_packets, args=('h1', 'h3', 's1-eth4', duration, packet_interval, deadline_value,weight,flow_id))
-thread2 = threading.Thread(target=send_packets, args=('h2', 'h3', 's1-eth4', duration, packet_interval, deadline_value2,weight2,flow_id))
-thread3 = threading.Thread(target=send_packets, args=('h5', 'h3', 's1-eth4', duration, packet_interval, deadline_value3,weight3,flow_id))
-thread4 = threading.Thread(target=send_packets, args=('h6', 'h3', 's1-eth4', duration, packet_interval, deadline_value4,weight4,flow_id))
+thread1 = threading.Thread(target=send_packets, args=('h1', 'h3', 's1-eth4', duration, packet_interval, deadline_value,weight,flow_id1))
+thread2 = threading.Thread(target=send_packets, args=('h2', 'h3', 's1-eth4', duration, packet_interval, deadline_value2,weight2,flow_id2))
+thread3 = threading.Thread(target=send_packets, args=('h5', 'h3', 's1-eth4', duration, packet_interval, deadline_value3,weight3,flow_id3))
+thread4 = threading.Thread(target=send_packets, args=('h6', 'h3', 's1-eth4', duration, packet_interval, deadline_value4,weight4,flow_id4))
 #thread5 = threading.Thread(target=send_packets, args=('h7', 'h3', 's1-eth4', duration, packet_interval, deadline_value5,weight5,flow_id))
 #thread6 = threading.Thread(target=send_packets, args=('h8', 'h3', 's1-eth4', duration, packet_interval, deadline_value6,weight6,flow_id))
 #thread7 = threading.Thread(target=send_packets, args=('h9', 'h3', 's1-eth4', duration, packet_interval, deadline_value6,weight6,flow_id))
@@ -85,11 +85,16 @@ with open("traffic_signal.txt", "w") as f:
     f.write("Start")
 thread1.start()
 thread2.start()
-thread3.start()
 thread1.join()
 thread2.join()
-thread3.join()
 
+
+thread3.start()
+thread4.start()
+
+
+thread3.join()
+thread4.join()
 #thread4.start()
 #thread5.start()
 #thread6.start()

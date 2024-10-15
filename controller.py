@@ -32,6 +32,8 @@ class Controller(object):
         self.controller.set_queue_rate(rate, port, priority)
     def register_read(self, register_name, index):
         return self.controller.register_read(register_name, index)
+    def counter_read(self, counter_name, index):
+        return self.controller.counter_read(counter_name, index)
     def table_dump(self, table_name):
         return self.controller.table_dump(table_name)
     def table_dump_keys(self, table_name,matches):
@@ -66,17 +68,6 @@ class Controller(object):
     def _set_queue_rate(self, rate, port, priority):
         self.controller.set_queue_rate(rate, port, priority)
 
-def find_smallest(data):
-    indexed_data = list(enumerate(data))
-
-    non_zero_data = [(index, value) for index, value in enumerate(data) if value != 0]
-    sorted_indexed_data = sorted(non_zero_data, key=lambda x: x[1])
-    first_smallest_index = sorted_indexed_data[0][0]+1
-    second_smallest_index = sorted_indexed_data[1][0]+1
-    #third_smallest_index = sorted_indexed_data[2][0]+1
-    #fourth_smallest_index = sorted_indexed_data[3][0]+1
-    return first_smallest_index, second_smallest_index
-
 
 def write_array_to_file(filename, array):
     with open(filename, "w") as file:
@@ -103,15 +94,18 @@ def main():
        process_array_2 = []
        process_array_3 = []
        process_array_4 = []
+       previous_packet_counts = None
 
        while not os.path.exists("traffic_signal.txt"):
         time.sleep(0.1)
 
        while not os.path.exists("stop_signal.txt"):
-         deadline = controller.register_read("deadline",None)
-         while non_zero_length(controller.register_read("deadline", None)) == 0:
+         flow_id = controller.register_read("flow",None)
+         while non_zero_length(controller.register_read("flow", None)) == 0:
              time.sleep(0.1)
-             deadline = controller.register_read("deadline",None)
+             flow_id = controller.register_read("flow",None)
+
+         deadline = controller.register_read("deadline",None)
          value = controller.register_read("register_timestamp",None)
          weight = controller.register_read("weight",None)
          packet1 = controller.register_read("packet_length", None)
@@ -123,37 +117,54 @@ def main():
                    break
             slack[i] = deadline[i] - (0.1+ 11760 / 80000000)
 
-         index1,index2 = find_smallest(slack)
-
-
-
-         controller.table_add("set_priority_h","set_priority",[str(int(index1))])
-         controller.table_add("set_priority_h","set_priority_8",[str(int(index2))])
+         active_flows = [(flow_id[i], deadline[i], slack[i]) for i in range(len(flow_id)) if flow_id[i] != 0]
+         active_flows.sort(key=lambda x: x[2])
+         #packet_counts = controller.counter_read("flow_packet_counter", flow_id[i])
+         #print(packet_counts)
+         #if previous_packet_counts is not None:
+         #    for i in range(len(packet_counts)):
+        #          print(f"Flow {i} packet count: {packet_counts[i]}")
+        #         if packet_counts[i] == previous_packet_counts[i]:
+        #             slack[i] = 0
+         #previous_packet_counts = packet_counts
+         for priority, flow in enumerate(active_flows, start=0):
+               current_flow_id,current_deadline, current_slack = flow
+               if current_slack > 0:
+                  action_name = f"set_priority_{priority + 1}"
+                  controller.table_add("set_priority_h", action_name, [str(current_flow_id)])
+                  print(f"Assigned priorities: Flow ID: {current_flow_id}, WFQ Time: {current_slack}, Deadline: {current_deadline},Action Name: {action_name}")
 
          #controller.table_add("set_priority_h","set_priority_5",[str(int(index5))])
-         #controller.table_add("set_priority_h","set_priority_6",[str(int(index6))])
-         #controller.table_add("set_priority_h","set_priority_7",[str(int(index7))])
+
          value2 = controller.register_read("finish_time",None)
          for i in range(non_zero_length(deadline)):
             if deadline[i] == 0:
                    break
             process = value2[i] - value[i]
             latency = value[i] - last_finish_time[i]
-
-            if process >0 and process not in process_array :
-               process_array.append(process)
-            if latency >0 and latency not in latency_array and latency>0:
-               latency_array.append(latency)
-            if deadline[i] + value[i] <=value2[i]:
-               throughput +=1
+            if process >0:
+                 if   i % 4 ==0 and process not in process_array_1:
+                       process_array_1.append(process)
+                 elif i % 4 == 1 and process not in process_array_2:
+                       process_array_2.append(process)
+                 elif i % 4 == 2 and process not in process_array_3:
+                       process_array_3.append(process)
+                 elif i % 4 == 3 and process not in process_array_4:
+                       process_array_4.append(process)
+                 if process not in process_array :
+                       process_array.append(process)
+                 if latency >0 and latency not in latency_array:
+                       latency_array.append(latency)
+                 if deadline[i] + value[i] <=value2[i]:
+                       throughput +=1
          last_finish_time = value2.copy()
 
        print(f"latency: ",sum(latency_array)/len(latency_array))
        print(f"Throughput: ",throughput)
-       #write_array_to_file("p1.txt", process_array_1)
-       #write_array_to_file("p2.txt", process_array_2)
-       #write_array_to_file("p3.txt", process_array_3)
-       #write_array_to_file("p4.txt", process_array_4)
+       write_array_to_file("p1.txt", process_array_1)
+       write_array_to_file("p2.txt", process_array_2)
+       write_array_to_file("p3.txt", process_array_3)
+       write_array_to_file("p4.txt", process_array_4)
        write_array_to_file("pa.txt", process_array)
        if os.path.exists("stop_signal.txt"):
            os.remove("stop_signal.txt")

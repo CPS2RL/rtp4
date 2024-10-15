@@ -238,7 +238,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 262,
+        "line" : 273,
         "column" : 8,
         "source_fragment" : "MyDeparser"
       },
@@ -247,14 +247,27 @@
     }
   ],
   "meter_arrays" : [],
-  "counter_arrays" : [],
+  "counter_arrays" : [
+    {
+      "name" : "MyIngress.flow_packet_counter",
+      "id" : 0,
+      "source_info" : {
+        "filename" : "/home/p4/ss/multiqueueing.p4",
+        "line" : 123,
+        "column" : 37,
+        "source_fragment" : "flow_packet_counter"
+      },
+      "size" : 20,
+      "is_direct" : false
+    }
+  ],
   "register_arrays" : [
     {
       "name" : "register_timestamp",
       "id" : 0,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 15,
+        "line" : 16,
         "column" : 23,
         "source_fragment" : "register_timestamp"
       },
@@ -266,7 +279,7 @@
       "id" : 1,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 16,
+        "line" : 17,
         "column" : 23,
         "source_fragment" : "finish_time"
       },
@@ -278,7 +291,7 @@
       "id" : 2,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 17,
+        "line" : 18,
         "column" : 23,
         "source_fragment" : "deadline"
       },
@@ -290,7 +303,7 @@
       "id" : 3,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 18,
+        "line" : 19,
         "column" : 23,
         "source_fragment" : "weight"
       },
@@ -298,11 +311,23 @@
       "bitwidth" : 32
     },
     {
-      "name" : "packet_length",
+      "name" : "flow",
       "id" : 4,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 19,
+        "line" : 20,
+        "column" : 23,
+        "source_fragment" : "flow"
+      },
+      "size" : 20,
+      "bitwidth" : 32
+    },
+    {
+      "name" : "packet_length",
+      "id" : 5,
+      "source_info" : {
+        "filename" : "/home/p4/ss/multiqueueing.p4",
+        "line" : 21,
         "column" : 23,
         "source_fragment" : "packet_length"
       },
@@ -311,15 +336,27 @@
     },
     {
       "name" : "priority",
-      "id" : 5,
+      "id" : 6,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 20,
+        "line" : 22,
         "column" : 22,
         "source_fragment" : "priority"
       },
       "size" : 20,
       "bitwidth" : 3
+    },
+    {
+      "name" : "counter_values",
+      "id" : 7,
+      "source_info" : {
+        "filename" : "/home/p4/ss/multiqueueing.p4",
+        "line" : 23,
+        "column" : 23,
+        "source_fragment" : "counter_values"
+      },
+      "size" : 20,
+      "bitwidth" : 32
     }
   ],
   "calculations" : [
@@ -328,7 +365,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 239,
+        "line" : 250,
         "column" : 1,
         "source_fragment" : "update_checksum( ..."
       },
@@ -410,7 +447,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 120,
+            "line" : 127,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -432,7 +469,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 120,
+            "line" : 127,
             "column" : 8,
             "source_fragment" : "mark_to_drop(standard_metadata)"
           }
@@ -467,7 +504,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 126,
+            "line" : 133,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.srcAddr = hdr.ethernet.dstAddr"
           }
@@ -486,7 +523,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 129,
+            "line" : 136,
             "column" : 8,
             "source_fragment" : "hdr.ethernet.dstAddr = dstAddr"
           }
@@ -505,7 +542,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 132,
+            "line" : 139,
             "column" : 8,
             "source_fragment" : "standard_metadata.egress_spec = port"
           }
@@ -547,7 +584,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 135,
+            "line" : 142,
             "column" : 8,
             "source_fragment" : "hdr.ipv4.ttl = hdr.ipv4.ttl -1"
           }
@@ -555,7 +592,7 @@
       ]
     },
     {
-      "name" : "MyIngress.set_priority",
+      "name" : "MyIngress.set_priority_1",
       "id" : 5,
       "runtime_data" : [],
       "primitives" : [
@@ -573,7 +610,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 152,
+            "line" : 159,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)7"
           }
@@ -599,7 +636,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 156,
+            "line" : 163,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)6"
           }
@@ -625,7 +662,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 159,
+            "line" : 166,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)5"
           }
@@ -651,7 +688,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 162,
+            "line" : 169,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)4"
           }
@@ -677,7 +714,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 165,
+            "line" : 172,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)3"
           }
@@ -703,7 +740,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 168,
+            "line" : 175,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)2"
           }
@@ -729,7 +766,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 171,
+            "line" : 178,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)1"
           }
@@ -755,7 +792,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 174,
+            "line" : 181,
             "column" : 7,
             "source_fragment" : "standard_metadata.priority = (bit<3>)0"
           }
@@ -763,7 +800,7 @@
       ]
     },
     {
-      "name" : "multiqueueing203",
+      "name" : "multiqueueing211",
       "id" : 13,
       "runtime_data" : [],
       "primitives" : [
@@ -786,7 +823,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["udp_deadline", "weight"]
+                        "value" : ["udp_deadline", "flow_id"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -804,9 +841,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 203,
+            "line" : 211,
             "column" : 37,
-            "source_fragment" : "hdr.udp_deadline.weight-1"
+            "source_fragment" : "hdr.udp_deadline.flow_id-1"
           }
         },
         {
@@ -827,9 +864,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 203,
+            "line" : 211,
             "column" : 12,
-            "source_fragment" : "register_timestamp.write(hdr.udp_deadline.weight-1,standard_metadata.ingress_global_timestamp)"
+            "source_fragment" : "register_timestamp.write(hdr.udp_deadline.flow_id-1,standard_metadata.ingress_global_timestamp)"
           }
         },
         {
@@ -851,7 +888,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["udp_deadline", "weight"]
+                        "value" : ["udp_deadline", "flow_id"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -869,9 +906,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 204,
+            "line" : 212,
             "column" : 27,
-            "source_fragment" : "hdr.udp_deadline.weight-1"
+            "source_fragment" : "hdr.udp_deadline.flow_id-1"
           }
         },
         {
@@ -892,9 +929,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 204,
+            "line" : 212,
             "column" : 12,
-            "source_fragment" : "deadline.write(hdr.udp_deadline.weight-1,hdr.udp_deadline.deadline)"
+            "source_fragment" : "deadline.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.deadline)"
           }
         },
         {
@@ -916,7 +953,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["udp_deadline", "weight"]
+                        "value" : ["udp_deadline", "flow_id"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -934,9 +971,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 205,
+            "line" : 213,
             "column" : 25,
-            "source_fragment" : "hdr.udp_deadline.weight-1"
+            "source_fragment" : "hdr.udp_deadline.flow_id-1"
           }
         },
         {
@@ -957,9 +994,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 205,
+            "line" : 213,
             "column" : 12,
-            "source_fragment" : "weight.write(hdr.udp_deadline.weight-1,hdr.udp_deadline.weight)"
+            "source_fragment" : "weight.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.weight)"
           }
         },
         {
@@ -981,7 +1018,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["udp_deadline", "weight"]
+                        "value" : ["udp_deadline", "flow_id"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -999,9 +1036,32 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 206,
-            "column" : 32,
-            "source_fragment" : "hdr.udp_deadline.weight-1"
+            "line" : 214,
+            "column" : 23,
+            "source_fragment" : "hdr.udp_deadline.flow_id-1"
+          }
+        },
+        {
+          "op" : "register_write",
+          "parameters" : [
+            {
+              "type" : "register_array",
+              "value" : "flow"
+            },
+            {
+              "type" : "field",
+              "value" : ["scalars", "tmp_2"]
+            },
+            {
+              "type" : "field",
+              "value" : ["udp_deadline", "flow_id"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "/home/p4/ss/multiqueueing.p4",
+            "line" : 214,
+            "column" : 12,
+            "source_fragment" : "flow.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.flow_id)"
           }
         },
         {
@@ -1013,7 +1073,7 @@
             },
             {
               "type" : "field",
-              "value" : ["scalars", "tmp_2"]
+              "value" : ["udp_deadline", "flow_id"]
             },
             {
               "type" : "field",
@@ -1022,15 +1082,34 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 206,
+            "line" : 215,
             "column" : 12,
-            "source_fragment" : "packet_length.write(hdr.udp_deadline.weight-1,hdr.ipv4.totalLen)"
+            "source_fragment" : "packet_length.write(hdr.udp_deadline.flow_id,hdr.ipv4.totalLen)"
+          }
+        },
+        {
+          "op" : "count",
+          "parameters" : [
+            {
+              "type" : "counter_array",
+              "value" : "MyIngress.flow_packet_counter"
+            },
+            {
+              "type" : "field",
+              "value" : ["udp_deadline", "flow_id"]
+            }
+          ],
+          "source_info" : {
+            "filename" : "/home/p4/ss/multiqueueing.p4",
+            "line" : 216,
+            "column" : 12,
+            "source_fragment" : "flow_packet_counter.count(hdr.udp_deadline.flow_id)"
           }
         }
       ]
     },
     {
-      "name" : "multiqueueing223",
+      "name" : "multiqueueing234",
       "id" : 14,
       "runtime_data" : [],
       "primitives" : [
@@ -1061,7 +1140,7 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 223,
+            "line" : 234,
             "column" : 8,
             "source_fragment" : "hdr.ipv4.tos = (bit<8>)standard_metadata.qid"
           }
@@ -1085,7 +1164,7 @@
                       "op" : "+",
                       "left" : {
                         "type" : "field",
-                        "value" : ["udp_deadline", "weight"]
+                        "value" : ["udp_deadline", "flow_id"]
                       },
                       "right" : {
                         "type" : "hexstr",
@@ -1103,9 +1182,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 225,
+            "line" : 236,
             "column" : 26,
-            "source_fragment" : "hdr.udp_deadline.weight-1"
+            "source_fragment" : "hdr.udp_deadline.flow_id-1"
           }
         },
         {
@@ -1126,9 +1205,9 @@
           ],
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 225,
+            "line" : 236,
             "column" : 8,
-            "source_fragment" : "finish_time.write(hdr.udp_deadline.weight-1,standard_metadata.egress_global_timestamp)"
+            "source_fragment" : "finish_time.write(hdr.udp_deadline.flow_id-1,standard_metadata.egress_global_timestamp)"
           }
         }
       ]
@@ -1140,20 +1219,20 @@
       "id" : 0,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 115,
+        "line" : 120,
         "column" : 8,
         "source_fragment" : "MyIngress"
       },
       "init_table" : "node_2",
       "tables" : [
         {
-          "name" : "tbl_multiqueueing203",
+          "name" : "tbl_multiqueueing211",
           "id" : 0,
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 203,
+            "line" : 211,
             "column" : 12,
-            "source_fragment" : "register_timestamp.write(hdr.udp_deadline.weight-1,standard_metadata.ingress_global_timestamp); ..."
+            "source_fragment" : "register_timestamp.write(hdr.udp_deadline.flow_id-1,standard_metadata.ingress_global_timestamp); ..."
           },
           "key" : [],
           "match_type" : "exact",
@@ -1163,10 +1242,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [13],
-          "actions" : ["multiqueueing203"],
+          "actions" : ["multiqueueing211"],
           "base_default_next" : "MyIngress.ipv4_lpm",
           "next_tables" : {
-            "multiqueueing203" : "MyIngress.ipv4_lpm"
+            "multiqueueing211" : "MyIngress.ipv4_lpm"
           },
           "default_entry" : {
             "action_id" : 13,
@@ -1180,7 +1259,7 @@
           "id" : 1,
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 138,
+            "line" : 145,
             "column" : 10,
             "source_fragment" : "ipv4_lpm"
           },
@@ -1218,15 +1297,15 @@
           "id" : 2,
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 178,
+            "line" : 185,
             "column" : 10,
             "source_fragment" : "set_priority_h"
           },
           "key" : [
             {
               "match_type" : "exact",
-              "name" : "hdr.udp_deadline.weight",
-              "target" : ["udp_deadline", "weight"],
+              "name" : "hdr.udp_deadline.flow_id",
+              "target" : ["udp_deadline", "flow_id"],
               "mask" : null
             }
           ],
@@ -1237,10 +1316,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [5, 6, 7, 8, 9, 10, 11, 12, 3, 1],
-          "actions" : ["MyIngress.set_priority", "MyIngress.set_priority_2", "MyIngress.set_priority_3", "MyIngress.set_priority_4", "MyIngress.set_priority_5", "MyIngress.set_priority_6", "MyIngress.set_priority_7", "MyIngress.set_priority_8", "MyIngress.drop", "NoAction"],
+          "actions" : ["MyIngress.set_priority_1", "MyIngress.set_priority_2", "MyIngress.set_priority_3", "MyIngress.set_priority_4", "MyIngress.set_priority_5", "MyIngress.set_priority_6", "MyIngress.set_priority_7", "MyIngress.set_priority_8", "MyIngress.drop", "NoAction"],
           "base_default_next" : null,
           "next_tables" : {
-            "MyIngress.set_priority" : null,
+            "MyIngress.set_priority_1" : null,
             "MyIngress.set_priority_2" : null,
             "MyIngress.set_priority_3" : null,
             "MyIngress.set_priority_4" : null,
@@ -1266,7 +1345,7 @@
           "id" : 0,
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 201,
+            "line" : 209,
             "column" : 12,
             "source_fragment" : "hdr.ipv4.isValid()"
           },
@@ -1282,7 +1361,7 @@
             }
           },
           "false_next" : null,
-          "true_next" : "tbl_multiqueueing203"
+          "true_next" : "tbl_multiqueueing211"
         }
       ]
     },
@@ -1291,18 +1370,18 @@
       "id" : 1,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 218,
+        "line" : 229,
         "column" : 8,
         "source_fragment" : "MyEgress"
       },
-      "init_table" : "tbl_multiqueueing223",
+      "init_table" : "tbl_multiqueueing234",
       "tables" : [
         {
-          "name" : "tbl_multiqueueing223",
+          "name" : "tbl_multiqueueing234",
           "id" : 3,
           "source_info" : {
             "filename" : "/home/p4/ss/multiqueueing.p4",
-            "line" : 223,
+            "line" : 234,
             "column" : 21,
             "source_fragment" : "= (bit<8>)standard_metadata.qid; ..."
           },
@@ -1314,10 +1393,10 @@
           "support_timeout" : false,
           "direct_meters" : null,
           "action_ids" : [14],
-          "actions" : ["multiqueueing223"],
+          "actions" : ["multiqueueing234"],
           "base_default_next" : null,
           "next_tables" : {
-            "multiqueueing223" : null
+            "multiqueueing234" : null
           },
           "default_entry" : {
             "action_id" : 14,
@@ -1337,7 +1416,7 @@
       "id" : 0,
       "source_info" : {
         "filename" : "/home/p4/ss/multiqueueing.p4",
-        "line" : 239,
+        "line" : 250,
         "column" : 1,
         "source_fragment" : "update_checksum( ..."
       },
