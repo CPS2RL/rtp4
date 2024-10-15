@@ -887,6 +887,7 @@ package V1Switch<H, M>(Parser<H, M> p,
 # 4 "/home/p4/ss/multiqueueing.p4" 2
 
 const bit<16> TYPE_IPV4 = 0x800;
+const bit<32> COUNTER_SIZE = 20;
 
 /*************************************************************************
 *********************** H E A D E R S  ***********************************
@@ -900,8 +901,12 @@ register <bit<48>>(20) register_timestamp;
 register <bit<48>>(20) finish_time;
 register <bit<64>>(20) deadline;
 register <bit<32>>(20) weight;
+register <bit<32>>(20) flow;
 register <bit<16>>(20) packet_length;
 register <bit<3>>(20) priority;
+register <bit<32>>(20) counter_values;
+
+
 
 
 header ethernet_t {
@@ -999,6 +1004,8 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 control MyIngress(inout headers hdr,
                   inout metadata meta,
                   inout standard_metadata_t standard_metadata) {
+    counter(20, CounterType.packets) flow_packet_counter;
+
 
     action drop() {
         mark_to_drop(standard_metadata);
@@ -1031,7 +1038,7 @@ control MyIngress(inout headers hdr,
         size = 1024;
         default_action = NoAction();
     }
-    action set_priority(){
+    action set_priority_1(){
 
        standard_metadata.priority = (bit<3>)7;
 
@@ -1061,10 +1068,10 @@ control MyIngress(inout headers hdr,
 
     table set_priority_h{
         key = {
-            hdr.udp_deadline.weight:exact;
+            hdr.udp_deadline.flow_id:exact;
         }
         actions = {
-            set_priority;
+            set_priority_1;
             set_priority_2;
             set_priority_3;
             set_priority_4;
@@ -1082,12 +1089,16 @@ control MyIngress(inout headers hdr,
     apply {
         // Only if IPV4 the rule is applied. Therefore other packets will not be forwarded.
         bit<3> priority_value;
+
         if (hdr.ipv4.isValid()){
 
-            register_timestamp.write(hdr.udp_deadline.weight-1,standard_metadata.ingress_global_timestamp);
-            deadline.write(hdr.udp_deadline.weight-1,hdr.udp_deadline.deadline);
-            weight.write(hdr.udp_deadline.weight-1,hdr.udp_deadline.weight);
-            packet_length.write(hdr.udp_deadline.weight-1,hdr.ipv4.totalLen);
+            register_timestamp.write(hdr.udp_deadline.flow_id-1,standard_metadata.ingress_global_timestamp);
+            deadline.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.deadline);
+            weight.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.weight);
+            flow.write(hdr.udp_deadline.flow_id-1,hdr.udp_deadline.flow_id);
+            packet_length.write(hdr.udp_deadline.flow_id,hdr.ipv4.totalLen);
+            flow_packet_counter.count(hdr.udp_deadline.flow_id);
+
             ipv4_lpm.apply();
             set_priority_h.apply();
 
@@ -1106,7 +1117,7 @@ control MyEgress(inout headers hdr,
    apply {
         hdr.ipv4.tos = (bit<8>)standard_metadata.qid;
 
-        finish_time.write(hdr.udp_deadline.weight-1,standard_metadata.egress_global_timestamp);
+        finish_time.write(hdr.udp_deadline.flow_id-1,standard_metadata.egress_global_timestamp);
 
 
 

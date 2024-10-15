@@ -10,7 +10,7 @@ from scapy.all import Packet, IPOption, Ether, IP, raw
 from scapy.all import ShortField, IntField, LongField, BitField, FieldListField, FieldLenField
 from scapy.layers.inet import _IPOption_HDR
 import time
-
+import os
 
 class Controller(object):
 
@@ -25,6 +25,8 @@ class Controller(object):
         self.controller.set_queue_rate(rate, port, priority)
     def register_read(self, register_name, index):
         return self.controller.register_read(register_name, index)
+    def counter_read(self, counter_name, index):
+        return self.controller.counter_read(counter_name, index)
     def table_dump(self, table_name):
         return self.controller.table_dump(table_name)
     def table_dump_keys(self, table_name,matches):
@@ -55,17 +57,6 @@ class Controller(object):
     def write_register(self, register_name, index, value):
         self.controller.register_write(register_name, index, value)
 
-def find_smallest(data):
-    indexed_data = list(enumerate(data))
-
-    non_zero_data = [(index, value) for index, value in enumerate(data) if value != 0]
-    sorted_indexed_data = sorted(non_zero_data, key=lambda x: x[1])
-    first_smallest_index = sorted_indexed_data[0][0]+1
-    second_smallest_index = sorted_indexed_data[1][0]+1
-    third_smallest_index = sorted_indexed_data[2][0]+1
-
-    return first_smallest_index, second_smallest_index,third_smallest_index
-
 def write_array_to_file(filename, array):
     with open(filename, "w") as file:
         file.write(", ".join(map(str, array)))
@@ -93,54 +84,66 @@ def main():
     process_array_2 = []
     process_array_3 = []
     process_array_4 = []
+    priority = 0
     last_finish_time=  [0] *7
     process_array = []
     throughput = 0
+    previous_wfq_times = {}
+
     while not os.path.exists("traffic_signal.txt"):
      time.sleep(0.1)
     while not os.path.exists("stop_signal.txt"):
-       weight = controller.register_read("weight",None)
-       while non_zero_length(controller.register_read("weight", None)) == 0:
+       flow_id = controller.register_read("flow",None)
+       while non_zero_length(controller.register_read("flow", None)) == 0:
            time.sleep(0.1)
-           weight = controller.register_read("weight",None)
+           flow_id = controller.register_read("flow",None)
+       weight = controller.register_read("weight",None)
        value = controller.register_read("register_timestamp",None)
-
-       for i in range(non_zero_length(weight)):
-          if weight[i] == 0:
-                 break
+       for i in range(non_zero_length(flow_id)):
           Vtick += 1/(1.2*10**6)
-
           Finsh_time_WFQ[i]= max(last_finish_time[i],Vtick) + 1470/weight[i]
 
-       index1,index2,index3= find_smallest(Finsh_time_WFQ)
+       active_flows = [(flow_id[i], weight[i], Finsh_time_WFQ[i]) for i in range(len(flow_id)) if flow_id[i] != 0]
+       active_flows.sort(key=lambda x: x[2])
 
-       controller.table_add("set_priority_h","set_priority",[str(int(index1))])
-       controller.table_add("set_priority_h","set_priority_5",[str(int(index2))])
-       controller.table_add("set_priority_h","set_priority_8",[str(int(index3))])
-       #controller.table_add("set_priority_h","set_priority_6",[str(int(index6))])
-       #controller.table_add("set_priority_h","set_priority_7",[str(int(index7))])
+       for priority, flow in enumerate(active_flows, start=0):
+             current_flow_id,current_weight, current_Finsh_time_WFQ = flow
+             if current_Finsh_time_WFQ > 0:
+                action_name = f"set_priority_{priority + 1}"
+                controller.table_add("set_priority_h", action_name, [str(current_flow_id)])
+                print(f"Assigned priorities: Flow ID: {current_flow_id}, WFQ Time: {current_Finsh_time_WFQ}, Action Name: {action_name}")
+
+
+       #controller.table_add("set_priority_h","set_priority",[str(int(index1))])
+       #controller.table_add("set_priority_h","set_priority_8",[str(int(index2))])
+
        value2 = controller.register_read("finish_time", None)
-       for i in range(len(weight)):
-          if weight[i] == 0:
-                 break
+       for i in range(non_zero_length(flow_id)):
           process = value2[i] - value[i]
           latency = value[i] - last_finish_time[i]
-
-          if process >0 and process not in process_array:
-             process_array.append(process)
-          if latency >0 and process not in latency_array:
-             latency_array.append(latency)
-          if value2[i]<Finsh_time_WFQ[i]:
-
-             throughput +=1
+          if process >0:
+            if   i % 4 ==0 and process not in process_array_1:
+                process_array_1.append(process)
+            elif i % 4 == 1 and process not in process_array_2:
+                process_array_2.append(process)
+            elif i % 4 == 2 and process not in process_array_3:
+                process_array_3.append(process)
+            elif i % 4 == 3 and process not in process_array_4:
+                process_array_4.append(process)
+            if process >0 and process not in process_array:
+               process_array.append(process)
+            if latency >0 and process not in latency_array:
+               latency_array.append(latency)
+            if value2[i]<Finsh_time_WFQ[i]:
+               throughput +=1
        last_finish_time = value2.copy()
     print(f"latency: ",sum(latency_array)/len(latency_array))
     print(f"Throughput: ",throughput)
-    #write_array_to_file("p1.txt", process_array_1)
-    #write_array_to_file("p2.txt", process_array_2)
-    #write_array_to_file("p3.txt", process_array_3)
-    #write_array_to_file("p4.txt", process_array_4)
-    write_array_to_file("pa.txt", process_array)
+    write_array_to_file("p1.txt", process_array_1)
+    write_array_to_file("p2.txt", process_array_2)
+    write_array_to_file("p3.txt", process_array_3)
+    write_array_to_file("p4.txt", process_array_4)
+    #write_array_to_file("pa.txt", process_array)
     if os.path.exists("stop_signal.txt"):
         os.remove("stop_signal.txt")
     if os.path.exists("traffic_signal.txt"):
